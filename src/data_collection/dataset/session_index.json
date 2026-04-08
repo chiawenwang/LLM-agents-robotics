@@ -1,0 +1,32 @@
+[
+  {
+    "file": "DLO_slinky_test_data_20260407_190238.json",
+    "session_start": "2026-04-08T02:02:38.207753",
+    "session_end": "2026-04-08T02:04:04.340076",
+    "n_records": 1
+  },
+  {
+    "file": "DLO_slinky_test_data_20260407_193818.json",
+    "session_start": "2026-04-08T02:38:18.584532",
+    "session_end": "2026-04-08T02:40:06.101908",
+    "n_records": 5
+  },
+  {
+    "file": "DLO_slinky_test_data_20260407_194131.json",
+    "session_start": "2026-04-08T02:41:31.133296",
+    "session_end": "2026-04-08T02:46:26.701306",
+    "n_records": 10
+  },
+  {
+    "file": "DLO_slinky_test_data_20260407_202411.json",
+    "session_start": "2026-04-08T03:24:11.911859",
+    "session_end": "2026-04-08T03:40:01.981193",
+    "n_records": 10
+  },
+  {
+    "file": "DLO_slinky_test_data_20260407_211706.json",
+    "session_start": "2026-04-08T04:17:06.942850",
+    "session_end": "2026-04-08T04:21:02.191303",
+    "n_records": 6
+  }
+]
