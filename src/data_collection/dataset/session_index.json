@@ -28,5 +28,125 @@
     "session_start": "2026-04-08T04:17:06.942850",
     "session_end": "2026-04-08T04:21:02.191303",
     "n_records": 6
+  },
+  {
+    "file": "DLO_slinky_test_data_20260407_212931.json",
+    "session_start": "2026-04-08T04:29:31.206174",
+    "session_end": "2026-04-08T16:10:48.535741",
+    "n_records": 1272
+  },
+  {
+    "file": "DLO_slinky_test_data_20260408_115321.json",
+    "session_start": "2026-04-08T18:53:21.917168",
+    "session_end": "2026-04-08T19:13:26.192861",
+    "n_records": 155
+  },
+  {
+    "file": "DLO_slinky_test_data_20260408_182523.json",
+    "session_start": "2026-04-09T01:25:23.196473",
+    "session_end": "2026-04-09T01:29:19.167575",
+    "n_records": 86
+  },
+  {
+    "file": "DLO_slinky_test_data_20260408_183047.json",
+    "session_start": "2026-04-09T01:30:47.550948",
+    "session_end": "2026-04-09T02:31:56.218670",
+    "n_records": 1836
+  },
+  {
+    "file": "DLO_slinky_1d_70cm_data_20260409_121345.json",
+    "session_start": "2026-04-09T19:13:45.940827",
+    "session_end": "2026-04-09T20:46:28.453230",
+    "n_records": 71
+  },
+  {
+    "file": "DLO_slinky_1d_70cm_data_20260409_153836.json",
+    "session_start": "2026-04-09T22:38:36.625209",
+    "session_end": "2026-04-09T22:38:55.417457",
+    "n_records": 0
+  },
+  {
+    "file": "DLO_slinky_1d_70cm_data_20260409_153958.json",
+    "session_start": "2026-04-09T22:39:58.835252",
+    "session_end": "2026-04-09T22:40:11.042794",
+    "n_records": 1
+  },
+  {
+    "file": "DLO_slinky_1d_70cm_data_20260409_154200.json",
+    "session_start": "2026-04-09T22:42:00.803332",
+    "session_end": "2026-04-09T22:44:00.286715",
+    "n_records": 2
+  },
+  {
+    "file": "DLO_slinky_1d_70cm_4pts_v1.json",
+    "session_start": "2026-04-09T22:48:10.215013",
+    "session_end": "2026-04-09T22:52:03.738017",
+    "n_records": 4
+  },
+  {
+    "file": "DLO_brizier_2d_rect_22pts_v1.json",
+    "session_start": "2026-04-10T01:09:48.888173",
+    "session_end": "2026-04-10T01:11:41.865085",
+    "n_records": 1
+  },
+  {
+    "file": "DLO_brizier_2d_rect_22pts_v2.json",
+    "session_start": "2026-04-10T01:17:29.911516",
+    "session_end": "2026-04-10T01:18:56.785648",
+    "n_records": 22
+  },
+  {
+    "file": "DLO_brizier_2d_rect_226pts_v1.json",
+    "session_start": "2026-04-10T01:21:41.717602",
+    "session_end": "2026-04-10T01:28:25.412122",
+    "n_records": 226
+  },
+  {
+    "file": "DLO_brizier_2d_rect_424pts_v1.json",
+    "session_start": "2026-04-10T01:33:30.636744",
+    "session_end": "2026-04-10T01:35:20.196523",
+    "n_records": 131
+  },
+  {
+    "file": "DLO_brizier_2d_rect_136pts_v1.json",
+    "session_start": "2026-04-10T01:37:12.608570",
+    "session_end": "2026-04-10T01:57:30.233270",
+    "n_records": 80
+  },
+  {
+    "file": "DLO_brizier_2d_semi_234pts_v2.json",
+    "session_start": "2026-04-10T02:09:14.518725",
+    "session_end": "2026-04-10T02:12:01.607183",
+    "n_records": 61
+  },
+  {
+    "file": "DLO_brizier_2d_rect_2332pts_v1.json",
+    "session_start": "2026-04-10T02:41:27.603588",
+    "session_end": "2026-04-10T11:45:00.762771",
+    "n_records": 2332
+  },
+  {
+    "file": "DLO_measuringtape_2d_rect_280pts_v2.json",
+    "session_start": "2026-04-10T20:58:59.609892",
+    "session_end": "2026-04-10T21:06:35.355989",
+    "n_records": 280
+  },
+  {
+    "file": "DLO_measuringtape_2d_rect_404pts_v1.json",
+    "session_start": "2026-04-10T21:07:44.435704",
+    "session_end": "2026-04-10T21:15:30.298057",
+    "n_records": 404
+  },
+  {
+    "file": "DLO_measuringtape_2d_rect_2357pts_v1.json",
+    "session_start": "2026-04-10T21:17:05.287943",
+    "session_end": "2026-04-10T21:51:46.494164",
+    "n_records": 2357
+  },
+  {
+    "file": "DLO_strip_2d_rect_2512pts_v5.json",
+    "session_start": "2026-04-11T00:05:10.337950",
+    "session_end": "2026-04-11T00:34:54.700586",
+    "n_records": 2512
   }
 ]

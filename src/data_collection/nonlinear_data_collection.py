@@ -41,7 +41,7 @@ class ExperimentConfig:
     workspace_z_min_mm: float =  100.0
     workspace_z_max_mm: float =  800.0
     workspace_y_min_mm: float =  100.0
-    workspace_y_max_mm: float =  700.0
+    workspace_y_max_mm: float =  900.0
 
     # ── Home pose ──────────────────────────────────────────────────────
     # home_x_mm: float = 0.0
@@ -57,7 +57,7 @@ class ExperimentConfig:
     grid_step_mm: float = 50.0  # Spacing between grid sample points in the domain (mm)
 
     # ── Stability gate ─────────────────────────────────────────────────
-    stability_window: int = 8
+    stability_window: int = 6
     stability_threshold_m: float = 0.007
     stability_timeout_sec: float = 5.0
     stability_poll_sec: float = 0.05
@@ -84,9 +84,18 @@ class ExperimentConfig:
     # This is Jiawen Wang's personal google drive "DLO_Library" folder.  Change if you want it to go somewhere else.
 
     # ── Helpers ───────────────────────────────────────────────────────
-    def make_output_path(self) -> Path:
+    def make_output_path(self, num_points: Optional[int] = None) -> Path:
+        dataset_dir = self.output_dir / "dataset"
+        if num_points is not None:
+            base_name = f"{self.experiment_name}_{num_points}pts"
+            version = 1
+            while True:
+                candidate = dataset_dir / f"{base_name}_v{version}.json"
+                if not candidate.exists():
+                    return candidate
+                version += 1
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return self.output_dir / "dataset" / f"{self.experiment_name}_data_{ts}.json"
+        return dataset_dir / f"{self.experiment_name}_data_{ts}.json"
 
     def make_config_dir_path(self, json_path: Path) -> Path:
         """
@@ -384,7 +393,7 @@ class RobotController:
 
         ok = self.arm.move_cartesian_relative(
             dx_mm=dx_mm, dy_mm=dy_mm, dz_mm=dz_mm,
-            timeout=self.config.move_timeout_sec,
+            # timeout=self.config.move_timeout_sec,
             joint_speed=self.config.joint_speed,
         )
         if not ok:
@@ -399,7 +408,7 @@ class RobotController:
         if self.debug:
             print("  [DEBUG] Would move to home position")
             return True
-        ok = self.arm.move_to_home(timeout=self.config.home_timeout_sec)
+        ok = self.arm.move_to_home()
         print("  ✓ Home position reached" if ok is not False else "  ✗ Failed to reach home position – IK error")
         return ok is not False
 
@@ -1332,8 +1341,9 @@ class DataManager:
 
             session_index = self.output_file.parent / "session_index.json"
             if session_index.exists():
-                sid = self._upload_file(svc, session_index, ds)
-                print(f"  ✓ Uploaded 'session_index.json' → Drive (id={sid})")
+                shared = self._get_or_create_folder(svc, "shared", root)
+                sid = self._upload_file(svc, session_index, shared)
+                print(f"  ✓ Uploaded 'session_index.json' → Drive/shared/ (id={sid})")
 
             # ── upload configs ─────────────────────────────────────
             if self.config_dir.exists():
@@ -1384,7 +1394,14 @@ class DataManager:
     def _upload_file(svc, path: Path, parent: str) -> str:
         from googleapiclient.http import MediaFileUpload
         media = MediaFileUpload(str(path), resumable=True)
-        meta  = {"name": path.name, "parents": [parent]}
+        # Overwrite if a file with the same name already exists in the folder.
+        q = f"name='{path.name}' and '{parent}' in parents and trashed=false"
+        existing = svc.files().list(q=q, fields="files(id)").execute().get("files", [])
+        if existing:
+            fid = existing[0]["id"]
+            svc.files().update(fileId=fid, media_body=media).execute()
+            return fid
+        meta = {"name": path.name, "parents": [parent]}
         return svc.files().create(
             body=meta, media_body=media, fields="id"
         ).execute()["id"]
@@ -1715,7 +1732,7 @@ class DataCollector:
             len([k for k in rec.get("markers", {}).keys()])
             for rec in grid_records
         ]
-        threshold = math.ceil(sum(marker_counts) / len(marker_counts))
+        threshold = round(sum(marker_counts) / len(marker_counts))
 
         to_retry = [
             rec for rec in grid_records
@@ -1933,6 +1950,23 @@ class DataCollector:
             if not self._preview_and_confirm():
                 print("Exiting without data collection.")
                 return
+        else:
+            # No interactive preview, but still simulate to count waypoints.
+            self._build_trajectory()
+        # ──────────────────────────────────────────────────────────────
+
+        # ── Rename output file with point count + version ──────────────
+        num_pts = len(self._last_trajectory)
+        if num_pts > 0:
+            new_path = self.config.make_output_path(num_points=num_pts)
+            self.data.output_file = new_path
+            self.data.output_file.parent.mkdir(parents=True, exist_ok=True)
+            self.data.config_dir = self.config.make_config_dir_path(new_path)
+            self.data.config_dir.mkdir(parents=True, exist_ok=True)
+            if self.config.save_frames:
+                self.data.frames_dir = self.data.config_dir / "frames"
+                self.data.frames_dir.mkdir(parents=True, exist_ok=True)
+            print(f"  Output file  : {self.data.output_file.resolve()}")
         # ──────────────────────────────────────────────────────────────
 
         try:
@@ -2061,7 +2095,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "'semicircle' = half-disk (e.g. taut elastic strip)."
         ),
     )
-    d.add_argument("--grid-step",         type=float, default=5.0, metavar="MM",
+    d.add_argument("--grid-step",         type=float, default=5, metavar="MM",
                    help="Grid spacing between sample points (mm).")
     # Rectangular domain
     d.add_argument("--domain-y-min",      type=float, default=None, metavar="MM",
@@ -2092,13 +2126,13 @@ def _build_parser() -> argparse.ArgumentParser:
     # Motion
     p.add_argument("--step-mm",            type=float, default=2,  metavar="MM",
                    help="Default step size for cardinal-direction moves (mm).")
-    p.add_argument("--move-timeout",       type=float, default=15.0,  metavar="SEC")
-    p.add_argument("--joint-speed",        type=float, default=0.01,  metavar="FRAC")
+    p.add_argument("--move-timeout",       type=float, default=360.0,  metavar="SEC")
+    p.add_argument("--joint-speed",        type=float, default=0.01,   metavar="FRAC")
 
     # Stability
-    p.add_argument("--stability-window",    type=int,   default=8,     metavar="N")
-    p.add_argument("--stability-threshold", type=float, default=0.005, metavar="M")
-    p.add_argument("--stability-timeout",   type=float, default=120.0, metavar="SEC")
+    p.add_argument("--stability-window",    type=int,   default=6,     metavar="N")
+    p.add_argument("--stability-threshold", type=float, default=0.006, metavar="M")
+    p.add_argument("--stability-timeout",   type=float, default=100.0,  metavar="SEC")
 
     # Frame saving
     p.add_argument("--no-live-preview",        action="store_true",
