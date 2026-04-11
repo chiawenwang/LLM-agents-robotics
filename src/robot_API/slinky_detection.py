@@ -147,6 +147,11 @@ class SlinkyVisionAPI:
         # ArUco detector
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
         self.aruco_params = cv2.aruco.DetectorParameters()
+        # self.aruco_params = cv2.aruco.DetectorParameters()
+        # self.aruco_params.adaptiveThreshConstant = 7        # default ~7, lower for dark images
+        self.aruco_params.polygonalApproxAccuracyRate = 0.07 # default 0.05, increase for distorted markers
+        self.aruco_params.errorCorrectionRate = 0.7          # default 0.6, increase to tolerate bit errors
+
         self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.aruco_params)
 
         # Stability gate parameters

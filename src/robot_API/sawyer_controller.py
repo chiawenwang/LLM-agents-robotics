@@ -242,7 +242,7 @@ class SawyerArmController:
         dx_mm: float = 0.0,
         dy_mm: float = 0.0,
         dz_mm: float = 0.0,
-        timeout: float = 15.0,
+        timeout: float = 360.0,
         joint_speed: float = 0.15,
         end_point: str = "right_hand",
     ) -> bool:
@@ -268,7 +268,7 @@ class SawyerArmController:
         -------
         ``True`` on success, ``False`` if IK failed or motion timed out.
         """
-        print(f"Moving Cartesian relative: dx={dx_mm} mm, dy={dy_mm} mm, dz={dz_mm} mm")
+        # print(f"Moving Cartesian relative: dx={dx_mm} mm, dy={dy_mm} mm, dz={dz_mm} mm")
         import rospy
         from geometry_msgs.msg import PoseStamped
         from intera_core_msgs.srv import SolvePositionIK, SolvePositionIKRequest
@@ -285,11 +285,11 @@ class SawyerArmController:
         pose_stamped.pose.orientation.z = self._home_ori_z
         pose_stamped.pose.orientation.w = self._home_ori_w
 
-        print(f"Target pose for IK:\n  Position (m): ({pose_stamped.pose.position.x:.3f}, "
-              f"{pose_stamped.pose.position.y:.3f}, {pose_stamped.pose.position.z:.3f})\n"
-              f"  Orientation (quat): ({pose_stamped.pose.orientation.x:.3f}, "
-              f"{pose_stamped.pose.orientation.y:.3f}, {pose_stamped.pose.orientation.z:.3f}, "
-              f"{pose_stamped.pose.orientation.w:.3f})")
+        # print(f"Target pose for IK:\n  Position (m): ({pose_stamped.pose.position.x:.3f}, "
+        #       f"{pose_stamped.pose.position.y:.3f}, {pose_stamped.pose.position.z:.3f})\n"
+        #       f"  Orientation (quat): ({pose_stamped.pose.orientation.x:.3f}, "
+        #       f"{pose_stamped.pose.orientation.y:.3f}, {pose_stamped.pose.orientation.z:.3f}, "
+        #       f"{pose_stamped.pose.orientation.w:.3f})")
 
         # Call the IK service
         ik_service = f"ExternalTools/{self._limb_name}/PositionKinematicsNode/IKService"
@@ -325,7 +325,7 @@ class SawyerArmController:
     # Reset to home
     # ------------------------------------------------------------------
 
-    def move_home(self, timeout: float = 15.0) -> bool:
+    def move_home(self, timeout: float = 360.0) -> bool:
         """
         Move the arm back to the stored home joint configuration.
 
@@ -441,7 +441,4 @@ if __name__ == "__main__":
     controller.move_home()
     print("Moved to home position.")
 
-    time.sleep(2.0)
-
-    controller.move_cartesian_relative(dx_mm=0.0, dy_mm=-101, dz_mm=-39.06884434373785)
-    # dx=0.0 mm, dy=-101.43388560019321 mm, dz=39.93115565626215 mm
+    # time.sleep(2.0)
