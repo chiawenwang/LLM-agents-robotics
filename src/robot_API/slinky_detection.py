@@ -122,7 +122,8 @@ class SlinkyVisionAPI:
         width: int = 640,
         height: int = 480,
         fps: int = 30,
-        aruco_dict_type: int = cv2.aruco.DICT_6X6_50,
+        # aruco_dict_type: int = cv2.aruco.DICT_6X6_50,
+        aruco_dict_type: int = cv2.aruco.DICT_5X5_50,
         headless: bool = False,
         # ── Stability gate parameters ──────────────────────────────────
         stability_window: int = 8,
@@ -149,7 +150,7 @@ class SlinkyVisionAPI:
         self.aruco_params = cv2.aruco.DetectorParameters()
         # self.aruco_params = cv2.aruco.DetectorParameters()
         # self.aruco_params.adaptiveThreshConstant = 7        # default ~7, lower for dark images
-        self.aruco_params.polygonalApproxAccuracyRate = 0.07 # default 0.05, increase for distorted markers
+        self.aruco_params.polygonalApproxAccuracyRate = 0.08 # default 0.05, increase for distorted markers
         self.aruco_params.errorCorrectionRate = 0.7          # default 0.6, increase to tolerate bit errors
 
         self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.aruco_params)
@@ -353,7 +354,8 @@ class SlinkyVisionAPI:
             self.start_camera()
         self._ensure_intrinsics()
 
-        marker_length_m = 0.020  # physical marker side length
+        # marker_length_m = 0.020  # physical marker side length
+        marker_length_m = 0.030  # physical marker side length
 
         frame = self.get_frame()
         corners, ids, _ = self.detect_markers(frame)
@@ -481,7 +483,9 @@ class SlinkyVisionAPI:
         last_vis_frame = None
 
         deadline = time.monotonic() + timeout
-        marker_length_m = 0.020
+        # marker_length_m = 0.020
+        marker_length_m = 0.030
+
 
         while time.monotonic() < deadline:
             frame = self.get_frame()
@@ -514,8 +518,9 @@ class SlinkyVisionAPI:
 
             if seen and self._windows_stable(windows, seen, win, thresh):
                 elapsed = timeout - max(0.0, deadline - time.monotonic())
+                raw_frame = self.get_frame() if save_image else None
                 return self._build_stable_result(
-                    windows, seen, frame_shape, True, elapsed, save_image, last_vis_frame
+                    windows, seen, frame_shape, True, elapsed, save_image, raw_frame
                 )
 
             time.sleep(self._stab_poll)
@@ -526,8 +531,9 @@ class SlinkyVisionAPI:
             f"  ⚠ Stability timeout ({timeout:.1f}s). "
             f"Returning running mean for: {sorted(seen) or 'none'}."
         )
+        raw_frame = self.get_frame() if save_image else None
         return self._build_stable_result(
-            windows, seen, frame_shape, False, elapsed, save_image, last_vis_frame
+            windows, seen, frame_shape, False, elapsed, save_image, raw_frame
         )
 
     # ------------------------------------------------------------------
@@ -570,7 +576,7 @@ class SlinkyVisionAPI:
         stability_reached: bool,
         elapsed_sec: float,
         save_image: Optional[str],
-        vis_frame: Optional[np.ndarray],
+        raw_frame: Optional[np.ndarray],
     ) -> Dict:
         """Assemble the return dict from windowed observations."""
         result: Dict = {
@@ -597,10 +603,10 @@ class SlinkyVisionAPI:
                 # Recover the integer marker ID from the key name
                 result["detected_markers"].append(int(key.split("_", 1)[1]))
 
-        if save_image and vis_frame is not None:
+        if save_image and raw_frame is not None:
             try:
                 Image.fromarray(
-                    cv2.cvtColor(vis_frame, cv2.COLOR_BGR2RGB)
+                    cv2.cvtColor(raw_frame, cv2.COLOR_BGR2RGB)
                 ).save(save_image)
                 result["saved_image_path"] = save_image
             except Exception as exc:
